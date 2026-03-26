@@ -1,0 +1,28 @@
+name: build recorder
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: setup vcpkg
+      run: |
+        vcpkg integrate install
+
+    - name: config CMake
+      run: >
+        cmake -B build 
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    - name: Upload Executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: recorder-exe
+        path: build/Release/*.exe
